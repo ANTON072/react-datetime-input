@@ -3,7 +3,11 @@ import DateTimeInput from "./DateTimeInput";
 function App() {
   return (
     <>
-      <DateTimeInput />
+      <DateTimeInput
+        onChange={(date) => {
+          console.log("date", date);
+        }}
+      />
     </>
   );
 }
