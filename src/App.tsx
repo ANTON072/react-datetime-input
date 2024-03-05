@@ -1,12 +1,11 @@
-import DateTimeInput from './DateTimeInput'
+import DateTimeInput from "./DateTimeInput";
 
 function App() {
-
   return (
     <>
       <DateTimeInput />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
