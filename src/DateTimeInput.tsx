@@ -10,6 +10,8 @@ type DateComponentProps = React.ComponentProps<typeof DateComponent>;
 
 interface Props {
   onChange: (date: Date | null) => void;
+  /** Epochミリ秒 */
+  initialValue?: number;
   wrapperClassName?: string;
   wrapperStyles?: React.CSSProperties;
 }
@@ -17,6 +19,19 @@ interface Props {
 const initialDateTime: DateTimeState = {
   date: "",
   time: "",
+};
+
+const createInitialProps = (initialValue?: number): DateTimeState => {
+  if (!initialValue) return initialDateTime;
+  const date = new Date(initialValue);
+  // yyyy-mm-dd 形式の日付
+  const dateStr = date.toISOString().split("T")[0];
+  // hh:mm 形式の時間（秒カット）
+  const timeStr = date.toTimeString().split(":").slice(0, 2).join(":");
+  return {
+    date: dateStr,
+    time: timeStr,
+  };
 };
 
 const convertToDate = (dateTimeState: DateTimeState) => {
@@ -29,10 +44,13 @@ const convertToDate = (dateTimeState: DateTimeState) => {
 
 function DateTimeInput({
   onChange,
+  initialValue,
   wrapperClassName = "date-time-input",
   wrapperStyles = {},
 }: Props) {
-  const [dateTime, setDateTime] = useState<DateTimeState>(initialDateTime);
+  const [dateTime, setDateTime] = useState<DateTimeState>(() =>
+    createInitialProps(initialValue),
+  );
 
   const handleChange: DateComponentProps["onChange"] = (key, value) => {
     const newState = { ...dateTime, [key]: value };
