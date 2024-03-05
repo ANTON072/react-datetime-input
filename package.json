@@ -1,8 +1,18 @@
 {
   "name": "react-datetime-input",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/datetime-input.umd.cjs",
+  "module": "./dist/datetime-input.js",
+  "exports": {
+    ".": {
+      "import": "./dist/datetime-input.js",
+      "require": "./dist/datetime-input.umd.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
