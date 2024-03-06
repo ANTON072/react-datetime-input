@@ -75,22 +75,22 @@ function DateTimeInput({
   };
 
   const handleReset = () => {
+    if (errorRef.current) {
+      // 以下は、2/31など無効な日付を入力している場合、DOMのinput要素には値が残るための処理
+      const wrapperEl = wrapperRef.current;
+      if (wrapperEl) {
+        const inputEls = wrapperEl.querySelectorAll("input");
+        inputEls.forEach((inputEl) => {
+          inputEl.value = "";
+        });
+      }
+    }
     setDateTime(defaultDateTimeState);
     errorRef.current = null;
     onChange({
       date: null,
       error: errorRef.current,
     });
-    /**
-     * 2/31など無効な日付を入力した場合、DOMのinput要素には値が残るための処理
-     */
-    const wrapperEl = wrapperRef.current;
-    if (wrapperEl) {
-      const inputEls = wrapperEl.querySelectorAll("input");
-      inputEls.forEach((inputEl) => {
-        inputEl.value = "";
-      });
-    }
   };
 
   return (
