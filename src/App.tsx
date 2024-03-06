@@ -11,18 +11,18 @@ function App() {
         gap: "1rem",
       }}
     >
-      {/* <DateTimeInput
-        onChange={(date) => {
-          console.log("date", date);
-        }}
-      /> */}
-
       <DateTimeInput
-        initialValue={Date.now()}
         onChange={(date) => {
           console.log("date", date);
         }}
       />
+
+      {/* <DateTimeInput
+        initialValue={Date.now()}
+        onChange={(date) => {
+          console.log("date", date);
+        }}
+      /> */}
 
       {/* <DateTimeInput
         key={testTime}

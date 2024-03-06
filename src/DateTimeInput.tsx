@@ -1,28 +1,32 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
-import DateComponent from "./DateComponent";
-import TimeComponent from "./TimeComponent";
+import InputComponent from "./InputComponent";
 import { componentWrapper } from "./styles";
 
 import type { DateTimeState } from "./types";
 
-type DateComponentProps = React.ComponentProps<typeof DateComponent>;
+type DateComponentProps = React.ComponentProps<typeof InputComponent>;
 
-interface Props {
-  onChange: (date: Date | null) => void;
+interface DateTimeValue {
+  date: Date | null;
+  error: string | null;
+}
+
+interface DateTimeInputProps {
+  onChange: (value: DateTimeValue) => void;
   /** Epochミリ秒 */
   initialValue?: number;
   wrapperClassName?: string;
   wrapperStyles?: React.CSSProperties;
 }
 
-const initialDateTime: DateTimeState = {
+const defaultDateTimeState: DateTimeState = {
   date: "",
   time: "",
 };
 
-const createInitialProps = (initialValue?: number): DateTimeState => {
-  if (!initialValue) return initialDateTime;
+const initializeDateTimeState = (initialValue?: number): DateTimeState => {
+  if (!initialValue) return defaultDateTimeState;
   const date = new Date(initialValue);
   // yyyy-mm-dd 形式の日付
   const dateStr = date.toISOString().split("T")[0];
@@ -47,30 +51,64 @@ function DateTimeInput({
   initialValue,
   wrapperClassName = "date-time-input",
   wrapperStyles = {},
-}: Props) {
+}: DateTimeInputProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
   const [dateTime, setDateTime] = useState<DateTimeState>(() =>
-    createInitialProps(initialValue),
+    initializeDateTimeState(initialValue),
   );
 
-  const handleChange: DateComponentProps["onChange"] = (key, value) => {
+  const errorRef = useRef<string | null>(null);
+
+  const handleChange: DateComponentProps["onChange"] = (key, inputValue) => {
+    const { value, error } = inputValue;
     const newState = { ...dateTime, [key]: value };
+    if (key === "date") {
+      errorRef.current = error;
+    }
     setDateTime(newState);
     const date = convertToDate(newState);
-    onChange(date);
+    onChange({
+      date,
+      error: errorRef.current,
+    });
   };
 
   const handleReset = () => {
-    setDateTime(initialDateTime);
-    onChange(null);
+    setDateTime(defaultDateTimeState);
+    errorRef.current = null;
+    onChange({
+      date: null,
+      error: errorRef.current,
+    });
+    /**
+     * 2/31など無効な日付を入力した場合、DOMのinput要素には値が残るための処理
+     */
+    const wrapperEl = wrapperRef.current;
+    if (wrapperEl) {
+      const inputEls = wrapperEl.querySelectorAll("input");
+      inputEls.forEach((inputEl) => {
+        inputEl.value = "";
+      });
+    }
   };
 
   return (
     <div
+      ref={wrapperRef}
       className={wrapperClassName}
       style={{ ...componentWrapper, ...wrapperStyles }}
     >
-      <DateComponent dateTime={dateTime} onChange={handleChange} />
-      <TimeComponent dateTime={dateTime} onChange={handleChange} />
+      <InputComponent
+        fieldType="date"
+        dateTimeState={dateTime}
+        onChange={handleChange}
+      />
+      <InputComponent
+        fieldType="time"
+        dateTimeState={dateTime}
+        onChange={handleChange}
+      />
       <button type="button" className="reset-button" onClick={handleReset}>
         リセット
       </button>
